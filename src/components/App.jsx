@@ -65,25 +65,6 @@ export class App extends Component {
     this.setState({ filter: e.currentTarget.value.toLowerCase() });
   };
 
-  //LOCAL STORAGE
-
-  componentDidMount() {
-    const data = localStorage.getItem('contacts');
-    const parsedData = JSON.parse(data);
-
-    if (parsedData) {
-      return this.setState({ contacts: [...parsedData] });
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const { contacts } = this.state;
-    if (prevState.contacts !== contacts) {
-      const data = JSON.stringify(contacts);
-      localStorage.setItem('contacts', data);
-    }
-  }
-
   render() {
     const { contacts, filter } = this.state;
     const filterSearch = contacts.filter(contact =>
