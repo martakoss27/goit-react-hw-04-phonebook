@@ -1,8 +1,8 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import { useContacts } from './hooks/ContactsContext';
 import { styled } from 'styled-components';
 
-export const Filter = ({ onChange, filter }) => {
+export default function Filter() {
+  const { filter, onChange } = useContacts();
   return (
     <StyledLabel style={{ color: 'black' }}>
       Find contacts by name
@@ -15,12 +15,7 @@ export const Filter = ({ onChange, filter }) => {
       />
     </StyledLabel>
   );
-};
-
-Filter.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  filter: PropTypes.string,
-};
+}
 
 const StyledInput = styled.input`
   border: 0;

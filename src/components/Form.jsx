@@ -1,8 +1,9 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import { useContacts } from './hooks/ContactsContext';
 import { styled } from 'styled-components';
 
-export const Form = ({ onSubmit }) => {
+export default function Form() {
+  const { onSubmit } = useContacts();
+
   return (
     <StyledForm onSubmit={onSubmit}>
       <StyledLabel>
@@ -28,11 +29,8 @@ export const Form = ({ onSubmit }) => {
       <StyledButton type="submit">Add contact</StyledButton>
     </StyledForm>
   );
-};
+}
 
-Form.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-};
 const StyledForm = styled.form`
   display: flex;
   flex-direction: column;

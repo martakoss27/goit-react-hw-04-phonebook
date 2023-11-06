@@ -1,25 +1,33 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import { styled } from 'styled-components';
+//import { nanoid } from 'nanoid';
 
-export const Contacts = ({ contacts, removeContact }) => {
+import { useContacts } from './hooks/ContactsContext';
+
+export default function Contacts({ children }) {
+  const { filteredContacts, handleDelete } = useContacts();
   return (
-    <StyledList>
-      {contacts.map(contact => (
-        <StyledLi key={contact.id}>
-          {contact.name}: {contact.number}
-          <StyledButton type="button" onClick={() => removeContact(contact.id)}>
-            REMOVE
-          </StyledButton>
-        </StyledLi>
-      ))}
-    </StyledList>
+    <div>
+      {children}
+      <StyledList>
+        {filteredContacts.map(contact => {
+          return (
+            <StyledLi key={contact.id}>
+              {contact.name}: {contact.number}
+              <StyledButton
+                type="button"
+                onClick={handleDelete}
+                value={contact.id}
+              >
+                REMOVE
+              </StyledButton>
+            </StyledLi>
+          );
+        })}
+      </StyledList>
+    </div>
   );
-};
-Contacts.propTypes = {
-  contacts: PropTypes.array.isRequired,
-  onClick: PropTypes.func.isRequired,
-};
+}
+
 const StyledList = styled.ul`
   padding: 0;
 `;
