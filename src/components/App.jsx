@@ -1,88 +1,78 @@
-import React, { Component } from 'react';
+//import React, { Component } from 'react';
+import { useEffect, useState } from 'react';
 import { Form } from './Form';
 import { Contacts } from './Contacts';
 import { Filter } from './Filter';
-import { nanoid } from 'nanoid';
+//import { nanoid } from 'nanoid';
 import Notiflix from 'notiflix';
 import { styled } from 'styled-components';
 
-export class App extends Component {
-  state = {
-    contacts: [],
-    filter: '',
-    name: '',
-    number: '',
-  };
+export const App = () => {
+  const [contacts, setContacts] = useState(
+    () => JSON.parse(localStorage.getItem('contacts')) ?? []
+  );
+  const [filter, setFilter] = useState('');
 
-  //nanoid = nanoid();
+  //LOCAL STORAGE
 
-  //FORM
-  handleSubmit = event => {
-    event.preventDefault();
-    const form = event.currentTarget;
-
-    const {
-      name: { value: name },
-      number: { value: number },
-    } = form.elements;
-
-    const contactExists = this.state.contacts.find(
-      contact => contact.name.toLowerCase() === name.toLowerCase()
-    );
-
-    if (contactExists) {
-      Notiflix.Notify.warning(`${name} is already in contacts.`);
-    } else {
-      const newContact = {
-        id: nanoid(),
-        name,
-        number,
-      };
-
-      this.setState(prevState => ({
-        contacts: [...prevState.contacts, newContact],
-      }));
-      Notiflix.Notify.success('New contact succesfully added!');
-      form.reset();
+  useEffect(() => {
+    const savedContacts = localStorage.getItem('contacts');
+    if (savedContacts) {
+      setContacts(JSON.parse(savedContacts));
     }
-  };
+  }, []);
 
-  //CONTACTS
-  handleClick = id => {
-    const { contacts } = this.state;
-    const contactToRemove = contacts.find(contact => contact.id === id);
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
 
-    if (contactToRemove) {
-      this.setState(prev => ({
-        contacts: prev.contacts.filter(contact => contact.id !== id),
-      }));
+  const handleAddContact = newContact => {
+    const existingContact = contacts.find(
+      contact => contact.name.toLowerCase() === newContact.name.toLowerCase()
+    );
 
-      Notiflix.Notify.success(`${contactToRemove.name} has been removed`);
+    if (existingContact) {
+      Notiflix.Notify.warning(`${newContact.name} is already in contacts.`);
+      return;
     }
-  };
-  //FILTER
-  handleFilterChange = e => {
-    this.setState({ filter: e.currentTarget.value.toLowerCase() });
+
+    setContacts(prevContacts => [...prevContacts, newContact]);
   };
 
-  render() {
-    const { contacts, filter } = this.state;
-    const filterSearch = contacts.filter(contact =>
-      contact.name.toLowerCase().includes(this.state.filter)
+  const handleDeleteContact = contactId => {
+    setContacts(prevContacts =>
+      prevContacts.filter(contact => contact.id !== contactId)
     );
-    return (
-      <StyledWrapper>
-        <StyledDiv>
-          <h1>Phonebook</h1>
-          <Form onSubmit={this.handleSubmit} />
-          <h2>Contacts list</h2>
-          <Filter onChange={this.handleFilterChange} filter={filter} />
-          <Contacts contacts={filterSearch} removeContact={this.handleClick} />
-        </StyledDiv>
-      </StyledWrapper>
+  };
+
+  const handleFilterChange = event => {
+    setFilter(event.target.value);
+  };
+
+  const getFilteredContacts = () => {
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(filter.toLowerCase())
     );
-  }
-}
+  };
+
+  const filteredContacts = getFilteredContacts();
+
+  return (
+    <StyledWrapper>
+      <StyledDiv>
+        <h1>Phonebook</h1>
+        <Form onSubmit={handleAddContact} />
+        <h2>Contacts list</h2>
+        <Filter onChange={handleFilterChange} filter={filter} />
+        <Contacts
+          contacts={filteredContacts}
+          removeContact={handleDeleteContact}
+        />
+      </StyledDiv>
+    </StyledWrapper>
+  );
+};
+
 const StyledWrapper = styled.div`
   height: 100vh;
   font-size: 30px;
